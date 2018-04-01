@@ -66,7 +66,11 @@ class Calculator extends Component {
     if (pos <= 0) pos = expr.indexOf('-') > 0;
     if (pos <= 0) pos = expr.indexOf('*') > 0;
     if (pos <= 0) pos = expr.indexOf('/') > 0;
-    return pos > 0 ? expr.substring(pos + 1) : this.state.lastAction;
+    var ret = "";
+    if (pos > 0 && this.isOperator(expr.slice(-1))) {
+      return expr.slice(-1) + expr.substring(0, pos);
+    }
+    return pos > 0 ? expr.substring(pos) : this.state.lastAction;
   };
   
   calculate = (character, input, reset = false) => {
@@ -98,12 +102,20 @@ class Calculator extends Component {
     return ret;
   };
   
+  isOperator = (car) => {
+    return (car === "+" || car === "-" || car === "/" || car === "*");
+  };
+  
+  haveOperator = (res) => {
+    return (res.indexOf('+') > 0 || res.indexOf('-') > 0 
+      || res.indexOf('*') > 0 || res.indexOf('/') > 0);
+  };
+  
   addNormal = (res, ret, num) => {
     var lstC = res.slice(-1);
-    var nIsOp = (num === "+" || num === "-" || num === "/" || num === "*");
-    var lIsOp = (lstC === "+" || lstC === "-" || lstC === "/" || lstC === "*");
-    var isEvaluable = (res.indexOf('+') > 0 || res.indexOf('-') > 0 
-                      || res.indexOf('*') > 0 || res.indexOf('/') > 0);
+    var nIsOp = this.isOperator(num);
+    var lIsOp = this.isOperator(lstC);
+    var isEvaluable = this.haveOperator(res);
     var isInt = Number.isInteger(num);
     if (res === "0" && isInt) {
       ret = num.toString();
@@ -135,8 +147,11 @@ class Calculator extends Component {
   };
   
   evaluateExpression = (expr, lastAction = false) => {
-    if (lastAction && this.state.lastAction !== "") {
-      expr = expr + this.state.lastAction;
+    if (lastAction) {
+      if (this.isOperator(expr.slice(-1)))
+        expr = expr.slice(0, -1) + this.getLastAction(expr);
+      else
+        expr = expr + this.state.lastAction;
     }
     return this.evaluate(expr);
   };
