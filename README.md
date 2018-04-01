@@ -1,6 +1,7 @@
 ## React Simple Calculator
 
 Simple calculator made with React.
+
 Example: https://txusko.github.io/ReactCalculator/
 
 Runs the app in the development mode.
