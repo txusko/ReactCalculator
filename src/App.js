@@ -108,12 +108,13 @@ class Calculator extends Component {
     if (res === "0" && isInt) {
       ret = num.toString();
     } else if (num === '.' && res.indexOf('.') > 0) {
-      ret = "0.";
+      if ((res.match(/\./g) || []).length <= 1)
+        ret = isEvaluable && !lIsOp ? res + num.toString() : "0.";
     } else if (nIsOp && lstC === ".") {
       ret = res;
     } else if (nIsOp && lIsOp) {
       ret = res.substring(0, res.length - 1) + num.toString();
-    } else if (!isInt && isEvaluable) {
+    } else if (!isInt && isEvaluable && num !== ".") {
       ret = this.evaluateExpression(res) + num.toString();
     } else {
       ret = res + num.toString();
